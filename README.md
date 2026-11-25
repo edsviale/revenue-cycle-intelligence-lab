@@ -27,15 +27,18 @@ A healthcare revenue cycle simulation and analytics portfolio study focused on *
 - **Revenue cycle analytics:** Exploratory analysis across denial category, preventability, payer segment, facility, provider, recovery, repeat denials, and time.
 - **Operational decision-making:** Recommendations focused on improving existing eligibility/COB, coding, documentation, and payer-monitoring processes.
 
-### Tableau dashboards
 
-| Dashboard | Purpose |
-|---|---|
-| **Study 01 — Executive Overview** | High-level KPIs, denial drivers, preventability |
-| **Study 01 — Payer & Recovery Analysis** | Payer exposure, denial rates, recovery performance |
-| **Study 01 — Operational Analysis** | Trends, facility exposure, repeat-denial activity |
+## Tableau Dashboards
 
-*Dashboard screenshots and a Tableau Public link can be added after export/publication.*
+### Executive Overview
+![Executive Overview](images/executive-overview.png)
+
+### Payer & Recovery Analysis
+![Payer & Recovery Analysis](images/payer-recovery-analysis.png)
+
+### Operational Analysis
+![Operational Analysis](images/operational-analysis.png)
+
 
 ### Documentation
 
