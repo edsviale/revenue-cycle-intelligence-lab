@@ -1,0 +1,49 @@
+PROJECT 2 CONTROLLED REGENERATION QA REPORT
+Seed: 20260915
+Report date: 2026-09-15
+
+Claims: 3000
+Claim lines: 3263
+Denial events: 333
+Claim submissions: 3228
+Authorizations: 992
+Coverage/COB records: 3000
+Pending claims: 133
+Initial denied claims: 303
+Adjudicated claims: 2867
+Initial denial rate: 10.57%
+Denial sequence counts: {1: 303, 2: 29, 3: 1}
+December service volume: 217 | monthly mean: 250.0
+
+Hard QA failures: 0
+Warnings: 0
+
+Scenario counts:
+  DEN01: 18
+  DEN02: 22
+  DEN03: 27
+  DEN04: 8
+  DEN05: 10
+  DEN06: 8
+  DEN07: 6
+  DEN08: 9
+  DEN09: 28
+  DEN10: 19
+  DEN11: 16
+  DEN12: 14
+  DEN13: 25
+  DEN14: 8
+  DEN15: 5
+  DEN16: 3
+  DEN17: 3
+  DEN18: 23
+  DEN19: 8
+  DEN20: 15
+  DEN21: 14
+  DEN22: 2
+  DEN23: 8
+  DEN24: 9
+  DEN25: 12
+  DEN26: 13
+
+RELEASE STATUS: PASS

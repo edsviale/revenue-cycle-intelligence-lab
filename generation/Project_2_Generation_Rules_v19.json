@@ -1,0 +1,362 @@
+{
+  "reimbursement": {
+    "Medicare_FFS": {
+      "status": "LOCKED",
+      "formula": "(CMS Base Units + Anesthesia Minutes / 15) * locality anesthesia conversion factor",
+      "time_unit_rule": "Use actual anesthesia minutes divided by 15; do not use Medi-Cal whole-unit rounding.",
+      "conversion_factors": {
+        "2025": {
+          "Area 18": 21.22,
+          "Area 17": 20.88,
+          "Area 62": 20.71
+        },
+        "2026": {
+          "Area 18": 21.26,
+          "Area 17": 20.99,
+          "Area 62": 20.88
+        }
+      },
+      "date_rule": "Use the conversion factor corresponding to the claim's Service Date year and Medicare locality.",
+      "financial_rule": "Round final expected allowed amount to cents."
+    },
+    "Medi-Cal_FFS": {
+      "status": "LOCKED",
+      "physician_formula": "(Base Units + Medi-Cal Time Units) * 14.01",
+      "crna_formula": "((Base Units - 1) + Medi-Cal Time Units) * 11.02",
+      "time_unit_rule": "Count full 15-minute units and add one additional unit when the remaining minutes are >= 5; preserve applicable under-5-minute handling.",
+      "modifier_mapping": {
+        "Physician": "AA",
+        "CRNA": "QZ"
+      },
+      "financial_rule": "Round final expected allowed amount to cents.",
+      "validated_example": {
+        "Claim ID": "CLM200966",
+        "Provider Type": "CRNA",
+        "CPT": "00400",
+        "Minutes": 147,
+        "Base Units": 3,
+        "Time Units": 10,
+        "Formula Units": 12,
+        "Rate": 11.02,
+        "Expected Allowed Amount": 132.24
+      }
+    },
+    "global_locked_constraints": [
+      "Expected Allowed Amount <= Gross Billed Amount.",
+      "Correct payer-specific time-unit methodology must be used before calculating expected allowance.",
+      "Use correct/canonical base units for reimbursement calculations; submitted erroneous units may drive a denial but must not redefine the correct expected allowance.",
+      "Reimbursement calculations must be deterministic for a given claim's DOS, payer basis, locality, provider type, CPT, and anesthesia minutes."
+    ],
+    "California_Workers_Compensation": {
+      "status": "LOCKED",
+      "formula": "(CMS Base Units + WC Time Units) * DWC Conversion Factor",
+      "time_unit_rule": "WC Time Units = round(Anesthesia Minutes / 15, 1)",
+      "do_not_use": "Do not use Medi-Cal whole-unit/remainder >=5-minute methodology for WC.",
+      "conversion_factors": {
+        "2025": {
+          "Area 18": 31.27,
+          "Area 17": 30.77,
+          "Area 62": 30.51
+        },
+        "2026": {
+          "Area 18": 32.09,
+          "Area 17": 31.68,
+          "Area 62": 31.52
+        }
+      },
+      "effective_date_rule": {
+        "2025_Table_A": "2025-09-01 through 2026-02-28",
+        "2026_Table_A": "2026-03-01 through 2026-08-31"
+      },
+      "county_locality_mapping": {
+        "Los Angeles": "Area 18",
+        "Orange": "Area 18",
+        "Ventura": "Area 17",
+        "Riverside": "Area 62",
+        "San Bernardino": "Area 62"
+      },
+      "hard_rules": [
+        "Use correct/canonical CMS base units to establish expected reimbursement.",
+        "Erroneous submitted units may support a denial but do not redefine the correct expected reimbursement benchmark.",
+        "Round final expected allowed amount to cents.",
+        "Expected Allowed Amount <= Gross Billed Amount.",
+        "After regeneration, recalculate all affected WC financial and recovery fields."
+      ],
+      "recalculation_scope": [
+        "Expected Allowed Amount",
+        "Initial Paid Amount",
+        "Initial Denied Amount",
+        "Final Paid Amount",
+        "Final Balance",
+        "Recovery-related amounts"
+      ]
+    },
+    "Commercial_Managed_Care": {
+      "status": "LOCKED",
+      "profile_ranges": {
+        "Commercial PPO/POS/OAP": {
+          "method": "Synthetic anesthesia conversion factor",
+          "range": "58-72"
+        },
+        "HMO/EPO": {
+          "method": "Synthetic anesthesia conversion factor",
+          "range": "48-62"
+        },
+        "Exchange": {
+          "method": "Synthetic anesthesia conversion factor",
+          "range": "46-58"
+        },
+        "Medicare Advantage": {
+          "method": "Synthetic percent of Medicare FFS",
+          "range": "105%-120%"
+        },
+        "Medi-Cal Managed": {
+          "method": "Synthetic percent of Medi-Cal FFS",
+          "range": "105%-125%"
+        },
+        "Network/Other Commercial": {
+          "method": "Synthetic anesthesia conversion factor",
+          "range": "45-58"
+        },
+        "Out-of-Area Medicaid": {
+          "method": "Synthetic percent of Medi-Cal FFS",
+          "range": "90%-110%"
+        }
+      },
+      "assignment_rule": "Each payer receives one fixed seeded synthetic reimbursement profile. The rate/profile does not change randomly claim by claim.",
+      "payer_consistency_rule": "All claims for the same payer/profile basis use the same synthetic contract rate or multiplier unless an explicitly modeled contract-period change is added in a future version.",
+      "independence_rule": "Synthetic contract generosity affects expected allowed amount only. It must not directly add an arbitrary denial-risk penalty.",
+      "financial_rules": [
+        "Expected Allowed Amount <= Gross Billed Amount.",
+        "Use correct/canonical base units and payer-appropriate time methodology when calculating the reimbursement benchmark.",
+        "Round final expected allowed amount to cents.",
+        "Managed Medicare is calculated from the corresponding Medicare FFS benchmark.",
+        "Medi-Cal Managed and Out-of-Area Medicaid are calculated from the corresponding Medi-Cal FFS benchmark."
+      ],
+      "documentation_note": "These are synthetic contract assumptions for portfolio modeling and must not be represented as actual payer contract terms."
+    }
+  },
+  "snapshot_date_sequencing_rules": {
+    "status": "LOCKED",
+    "report_date": "2026-09-15",
+    "snapshot_rules": [
+      "Service Date <= 2026-08-31.",
+      "Submit Date <= Report Date.",
+      "Initial Adjudication Date <= Report Date if populated.",
+      "Denial Date <= Report Date.",
+      "Follow-Up Date <= Report Date if populated.",
+      "Appeal Date <= Report Date if populated.",
+      "Resolution Date <= Report Date if populated.",
+      "Claim_Submissions Submission Date <= Report Date.",
+      "Eligibility and authorization activity after Report Date must not appear in the point-in-time snapshot.",
+      "Future activity must not be moved earlier to fit the snapshot; it must remain blank/not yet present."
+    ],
+    "pending_claim_rules": [
+      "If true adjudication would occur after Report Date, Initial Claim Status = Pending.",
+      "Initial Adjudication Date = blank/null.",
+      "Initial Paid Amount = 0.",
+      "Initial Denied Amount = 0.",
+      "Denial Event Count = 0.",
+      "Has Denial = No."
+    ],
+    "within_event_chronology": [
+      "Follow-Up Date >= Denial Date when populated.",
+      "Appeal Date >= Follow-Up Date when Appeal Submitted = Yes and Follow-Up Date exists.",
+      "Appeal Date >= Denial Date when Appeal Submitted = Yes.",
+      "Resolution Date >= latest applicable prior action date.",
+      "Days to Resolution = Resolution Date - Denial Date.",
+      "No negative or impossible chronology."
+    ],
+    "repeat_denial_chronology": [
+      "Sequence 2 or 3 must occur only after the prior corrective/resubmission action that could produce a new adjudication.",
+      "A later denial may not appear while the prior event is unresolved unless Claim_Submissions history supports a legitimate new adjudication.",
+      "Prior Denial Event ID points to the immediately preceding denial event.",
+      "Trigger Submission ID identifies the submission that produced the new denial.",
+      "Clean sequence: Denial 1 -> correction/resubmission -> Denial 2 -> correction/resubmission -> Denial 3."
+    ],
+    "resolution_submission_linkage": [
+      "If resolved by corrected claim, Resolution Submission ID must exist.",
+      "Resolution Submission Date must be after the denial.",
+      "Resolution Date must be on/after Resolution Submission Date.",
+      "Appeal Outcome cannot exist before Appeal Date.",
+      "Recovered Amount resulting from appeal cannot be recognized before resolution."
+    ],
+    "hard_qa_failures": [
+      "Visible future activity after Report Date.",
+      "Resolution Date before Denial Date.",
+      "Appeal Date before Denial Date or before required follow-up.",
+      "Sequence 2/3 before the action that should have produced it.",
+      "Submission Number chronology out of order.",
+      "Denial linked to a submission occurring after the denial date.",
+      "Pending claim with visible future adjudication outcome."
+    ]
+  },
+  "recovery_repeat_denial_financial_rules": {
+    "status": "LOCKED",
+    "recovery_amount_rules": [
+      "Recovered Amount <= Denied Amount.",
+      "Recovered Amount <= remaining recoverable allowed amount.",
+      "Open / Unresolved denial events must have Recovered Amount = 0.",
+      "DEN20 true duplicate must have Recovered Amount = 0.",
+      "DEN23 correctly bundled / non-separately payable must have Recovered Amount = 0.",
+      "Recovery cannot be recognized before Resolution Date.",
+      "Recovery follows the scenario-specific recovery probability and typical-days logic already defined."
+    ],
+    "unique_revenue_at_risk_rules": [
+      "Repeat denials against the same dollars must not inflate unique revenue exposure.",
+      "The first denial event that places dollars at risk carries Unique Revenue at Risk Flag = Yes.",
+      "Later repeat denials against the same dollars carry Unique Revenue at Risk Flag = No.",
+      "If a later denial adds newly denied dollars, only the incremental new amount counts as new unique revenue at risk.",
+      "Claim-level Unique Revenue at Risk <= total recoverable allowed amount."
+    ],
+    "repeat_denial_financial_sequencing": [
+      "Event 1 may deny the full or partial expected allowed amount.",
+      "After correction/resubmission, later events may deny the same remaining amount again.",
+      "Later events do not create new unique risk unless they affect additional previously unexposed dollars.",
+      "Recovered dollars from earlier events reduce the remaining amount available for later recovery.",
+      "Sum of Recovered Amount across all denial events for a claim <= claim-level Unique Revenue at Risk."
+    ],
+    "final_paid_reconciliation": [
+      "Final Paid Amount <= Expected Allowed Amount.",
+      "Generally Final Paid Amount + Final Balance = Expected Allowed Amount unless an intentional contractual/non-recoverable adjustment is modeled.",
+      "For correctly non-recoverable outcomes, denied dollars may remain unpaid.",
+      "Final Balance may be 0 when the amount is contractually written off/non-recoverable, but claim/final denial status must explain the outcome."
+    ],
+    "scenario_recovery_behavior": {
+      "principle": "Preserve the existing scenario-specific recovery probabilities and typical-days logic unless explicitly revised later.",
+      "relative_behavior": {
+        "coding_modifier": "high",
+        "missing_information": "high",
+        "payer_processing_error": "fairly high",
+        "eligibility": "moderate",
+        "authorization": "moderate",
+        "medical_necessity": "lower",
+        "timely_filing": "low",
+        "non_covered": "low",
+        "true_duplicate": "zero",
+        "correct_bundling": "zero"
+      }
+    },
+    "resolution_status_logic": {
+      "controlled_values": [
+        "Open / Unresolved",
+        "Resolved - Recovered",
+        "Resolved - Not Recovered",
+        "Corrected / Subsequent Denial",
+        "Closed - No Revenue Opportunity"
+      ],
+      "rules": [
+        "Resolved - Recovered requires Recovered Amount > 0.",
+        "Resolved - Not Recovered requires Recovered Amount = 0.",
+        "Open / Unresolved requires no Resolution Date and Recovered Amount = 0.",
+        "Corrected / Subsequent Denial requires a later valid denial sequence.",
+        "Closed - No Revenue Opportunity is appropriate for true duplicate, correct bundling, or other no-revenue-opportunity outcomes."
+      ]
+    },
+    "hard_qa_failures": [
+      "Recovered Amount > Denied Amount.",
+      "Total claim recovery > claim-level Unique Revenue at Risk.",
+      "Repeat denial events inflate Unique Revenue at Risk.",
+      "Open denial event has recovered dollars.",
+      "DEN20 true duplicate or DEN23 correct bundling recovers money.",
+      "Final Paid Amount > Expected Allowed Amount.",
+      "Financial outcome contradicts Final Denial Status."
+    ]
+  },
+  "final_qa_validation_rules": {
+    "status": "LOCKED",
+    "structural_integrity": [
+      "Every Claim Line must link to a valid Claim.",
+      "Every Denial Event must link to a valid Claim and, when applicable, a valid Claim Line.",
+      "Every Trigger Submission ID and Resolution Submission ID must link to a valid submission.",
+      "Every Authorization ID must link to a valid authorization record.",
+      "Every Coverage COB ID must link to a valid coverage record.",
+      "No orphan foreign keys.",
+      "No duplicate primary keys."
+    ],
+    "financial_integrity_hard_failures": [
+      "Expected Allowed Amount > Gross Billed Amount.",
+      "Initial Paid Amount + Initial Denied Amount > Expected Allowed Amount.",
+      "Recovered Amount > Denied Amount.",
+      "Final Paid Amount > Expected Allowed Amount.",
+      "Total claim recovery > claim-level Unique Revenue at Risk.",
+      "Repeat denials double-count Unique Revenue at Risk.",
+      "Line totals fail to reconcile reasonably to claim totals."
+    ],
+    "coding_reimbursement_integrity": [
+      "CPT must exist in the defined project universe.",
+      "Correct CMS base units must be present.",
+      "Physician primary modifier = AA.",
+      "CRNA primary modifier = QZ.",
+      "76942 modifier = 26.",
+      "Modeled injection modifiers = XU.",
+      "Medicare uses Medicare time logic.",
+      "Medi-Cal uses Medi-Cal time logic.",
+      "Workers' Compensation uses minutes / 15 rounded to 1 decimal.",
+      "Correct locality/year reimbursement factors must be applied."
+    ],
+    "denial_evidence_integrity": [
+      "Authorization denial must be supported by an authorization defect record.",
+      "Eligibility/COB denial must be supported by Coverage_COB evidence.",
+      "Coding denial must be supported by submitted-vs-correct coding differences.",
+      "Duplicate denial must be supported by submission history.",
+      "Timely filing denial must have an actual filing-limit violation.",
+      "Missing-information denial must correspond to an actually missing/invalid required field.",
+      "Payer-processing denial requires otherwise-correct underlying claim data.",
+      "No denial may exist solely because a random denial category was selected."
+    ],
+    "chronology_snapshot_integrity": [
+      "Apply all locked Step 4 snapshot/date rules.",
+      "No visible event after 2026-09-15.",
+      "No impossible date sequence.",
+      "Repeat denials must follow valid resubmission/adjudication activity.",
+      "Pending claims must not expose future adjudication data.",
+      "Resolution and recovery cannot precede the actions that produced them."
+    ],
+    "distribution_guardrails_diagnostic_only": {
+      "initial_denial_rate": "roughly 9%-12%",
+      "repeat_denials": "uncommon",
+      "provider_location_payer_rates": "no unexplained extreme outliers",
+      "procedure_facility_mix": "consistent with design",
+      "monthly_volume": "mild variation",
+      "december_elective_dip": "visible but modest",
+      "recovery_rates": "broadly consistent with scenario difficulty",
+      "rule": "Investigate deviations; do not manipulate the generator merely to force preferred distributions."
+    },
+    "targeted_regression_checks": [
+      "No future adjudication dates.",
+      "No overlapping/impossible denial sequences.",
+      "Workers' Compensation reimbursement corrected.",
+      "No unsupported authorization-unit denials.",
+      "Duplicate denials have submission evidence.",
+      "76942 bundling behavior works.",
+      "Secondary modifiers are correct.",
+      "Eligibility/COB evidence exists.",
+      "Submitted-vs-correct coding fields support denials.",
+      "Missing-unit denials represent actual defects.",
+      "Documentation/referring-ID denials have supporting fields.",
+      "Payer-error bundling targets eligible secondary lines.",
+      "Unique Revenue at Risk is de-duplicated."
+    ],
+    "final_release_gate": [
+      "Zero hard QA failures.",
+      "All six production tables reconcile.",
+      "All known prior defects pass regression testing.",
+      "Distributions remain plausible.",
+      "No manual manipulation was used to create a preferred analytical finding."
+    ],
+    "open_item_before_generation": null,
+    "generation_readiness": "All previously identified rulebook items are now resolved; controlled regeneration may proceed."
+  },
+  "denial_code_final_overrides": {
+    "DEN06": {
+      "status": "LOCKED",
+      "scenario": "Authorized CPT/service mismatch",
+      "CARC": "198",
+      "RARC": "N54",
+      "evidence_rule": "Authorization exists and Authorized CPT != Submitted CPT.",
+      "root_cause_owner": "Authorization",
+      "preventable": "Yes"
+    }
+  }
+}
