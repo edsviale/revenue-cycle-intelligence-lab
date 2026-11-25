@@ -1,5 +1,5 @@
 # Healthcare Revenue Cycle Simulation & Analytics 
-Study 01: Synthetic Anesthesia Claims & Denial Analysis 
+Study 01: Synthetic Anesthesia Claims & Denial Analysis \
 Dataset Generation Methodology
 
 # Purpose
