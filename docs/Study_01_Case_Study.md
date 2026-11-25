@@ -1,7 +1,6 @@
-Healthcare Revenue Cycle Simulation & Analytics \| Study 01: Synthetic
-Anesthesia Claims & Denial Analysis \| Case Study
-
+# Healthcare Revenue Cycle Simulation & Analytics
 Study 01: Synthetic Anesthesia Claims & Denial Analysis
+Case Study
 
 # Project Overview
 
